@@ -1,4 +1,3 @@
-import asyncio
 import io
 import tempfile
 
@@ -23,8 +22,8 @@ tortoise_image = (
     )
 )
 
-
-class Modal:
+###### MODAL GPU Model.
+class Model:
     def __enter__(self):
         from tortoise.api import MODELS_DIR, TextToSpeech
         from tortoise.utils.audio import load_voices
@@ -50,12 +49,8 @@ class Modal:
 
         return wav
 
-    @stub.webhook(method="POST", image=tortoise_image, gpu="A100")
-    def run_tts(self, req: Request):
-        body = asyncio.run(req.json())
-        text = body["text"]
-        voices = body["voices"]
-
+    @stub.function(image=tortoise_image, gpu="A100")
+    def run_tts(self, text, voices):
         CANDIDATES = 1  # NOTE: this code only works for one candidate.
         CVVP_AMOUNT = 0.0
         SEED = None
@@ -85,7 +80,48 @@ class Modal:
 
         wav = self.process_synthesis_result(gen.squeeze(0).cpu())
 
-        return Response(content=wav.getvalue(), media_type="audio/wav")
+        return wav
+
+
+###### MODAL CPU API Key Logic.
+
+supabase_image = modal.Image.debian_slim().pip_install("supabase")
+
+
+@stub.webhook(
+    method="POST",
+    image=supabase_image,
+    secret=modal.Secret.from_name("supabase-tortoise-secrets"),
+)
+def app(req: Request):
+    import asyncio
+    import os
+    import time
+
+    from supabase import Client, create_client
+
+    url: str = os.environ.get("SUPABASE_URL")
+    key: str = os.environ.get("SUPABASE_KEY")
+    supabase: Client = create_client(url, key)
+
+    body = asyncio.run(req.json())
+    text = body["text"]
+    voices = body["voices"]
+    api_key = body["api_key"]
+
+    # data = supabase.table("users").select("*").eq("api_key", api_key).execute()
+    data = supabase.table("users").select("*").execute()
+    print(data)
+    start = time.time()
+    wav = Model().run_tts.call(text, voices)
+    end = time.time()
+    print(end - start)
+    return Response(content=wav.getvalue(), media_type="audio/wav")
+
+    # Query supabase to check if the access token is valid (i.e. exists in `users` table)
+    # If it is, then run the model.
+    # return Response(content=wav.getvalue(), media_type="audio/wav")
+    # If it isn't, then return a 401.
 
 
 if __name__ == "__main__":
