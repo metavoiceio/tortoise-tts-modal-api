@@ -16,17 +16,16 @@ def download_models():
 
 
 tortoise_image = (
-    modal.Image.conda()
-    .apt_install("git")
-    .apt_install("libsndfile-dev")
-    .apt_install("ffmpeg")
-    .apt_install("curl")
-    .run_commands(
-        "pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116",
-        "git clone https://github.com/metavoicexyz/tortoise-tts",
-        "cd tortoise-tts; pip install -r requirements.txt; pip install -e .",
-        "pip install pydub",
+    modal.Image.debian_slim()
+    .apt_install("git", "libsndfile-dev", "ffmpeg", "curl")
+    .pip_install(
+        "torch",
+        "torchvision",
+        "torchaudio",
+        "pydub",
+        extra_index_url="https://download.pytorch.org/whl/cu116",
     )
+    .pip_install("git+https://github.com/metavoicexyz/tortoise-tts")
     .run_function(download_models)
 )
 
