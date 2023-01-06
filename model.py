@@ -7,6 +7,14 @@ import modal
 
 stub = modal.Stub("tts")
 
+
+def download_models():
+    from tortoise.api import MODELS_DIR, TextToSpeech
+
+    tts = TextToSpeech(models_dir=MODELS_DIR)
+    tts.get_random_conditioning_latents()
+
+
 tortoise_image = (
     modal.Image.conda()
     .apt_install("git")
@@ -17,10 +25,9 @@ tortoise_image = (
         "pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116",
         "git clone https://github.com/metavoicexyz/tortoise-tts",
         "cd tortoise-tts; pip install -r requirements.txt; pip install -e .",
-        # download models as part of the container.
-        "python -c 'from tortoise.api import MODELS_DIR, TextToSpeech;tts = TextToSpeech(models_dir=MODELS_DIR); tts.get_random_conditioning_latents()'",
         "pip install pydub",
     )
+    .run_function(download_models)
 )
 
 
