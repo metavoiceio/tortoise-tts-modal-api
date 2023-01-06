@@ -15,7 +15,7 @@ tortoise_image = (
     .apt_install("curl")
     .run_commands(
         "pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116",
-        "git clone https://github.com/vatsalaggarwal/tortoise-tts",
+        "git clone https://github.com/metavoicexyz/tortoise-tts",
         "cd tortoise-tts; pip install -r requirements.txt; pip install -e .",
         # download models as part of the container.
         "python -c 'from tortoise.api import MODELS_DIR, TextToSpeech;tts = TextToSpeech(models_dir=MODELS_DIR); tts.get_random_conditioning_latents()'",
