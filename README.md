@@ -6,6 +6,8 @@ Tortoise is one of the best text-to-speech systems ever built, but it currently 
 
 We have made some improvements to Tortoise to make the inference 30% faster, and welcome contributions to improve it further!
 
+We also provide a Python API wrapper that can used for easy integration into your Python code.
+
 ## Voices
 There are four ways to get different voices out of this model:
 - `random`: The model randomly picks a voice in its embedding space
