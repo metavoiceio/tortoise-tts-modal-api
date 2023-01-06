@@ -17,6 +17,10 @@ supabase_image = modal.Image.debian_slim().pip_install("supabase")
     secret=modal.Secret.from_name("supabase-tortoise-secrets"),
 )
 def app(req: Request):
+    """
+    POST endpoint for running Tortoise. Checks whether the user exists,
+    and adds usage time to the user's account.
+    """
     import asyncio
     import time
 
