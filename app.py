@@ -1,22 +1,30 @@
 import os
 
+import fastapi
+import fastapi.middleware.cors
 import modal
 from fastapi import Request
 from fastapi.responses import Response
 
 from model import TortoiseModal, stub
 
+## Setup FastAPI server.
+web_app = fastapi.FastAPI()
+web_app.add_middleware(
+    fastapi.middleware.cors.CORSMiddleware,
+    allow_origins=["*", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 ###### MODAL CPU API Key Logic.
 
 supabase_image = modal.Image.debian_slim().pip_install("supabase")
 
 
-@stub.webhook(
-    method="POST",
-    image=supabase_image,
-    secret=modal.Secret.from_name("supabase-tortoise-secrets"),
-)
-def app(req: Request):
+@web_app.post("/")
+def post_request(req: Request):
     """
     POST endpoint for running Tortoise. Checks whether the user exists,
     and adds usage time to the user's account.
@@ -61,6 +69,14 @@ def app(req: Request):
     else:
         # return a 401
         return Response(status_code=401)
+
+
+@stub.asgi(
+    image=supabase_image,
+    secret=modal.Secret.from_name("supabase-tortoise-secrets"),
+)
+def app():
+    return web_app
 
 
 if __name__ == "__main__":

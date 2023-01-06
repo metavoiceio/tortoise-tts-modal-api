@@ -4,3 +4,4 @@ isort
 requests
 pydub
 numpy
+fastapi
