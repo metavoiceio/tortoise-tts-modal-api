@@ -109,19 +109,24 @@ def app(req: Request):
     voices = body["voices"]
     api_key = body["api_key"]
 
-    # data = supabase.table("users").select("*").eq("api_key", api_key).execute()
-    data = supabase.table("users").select("*").execute()
-    print(data)
-    start = time.time()
-    wav = Model().run_tts.call(text, voices)
-    end = time.time()
-    print(end - start)
-    return Response(content=wav.getvalue(), media_type="audio/wav")
+    data = supabase.table("users").select("*").eq("api_key", api_key).execute()
 
-    # Query supabase to check if the access token is valid (i.e. exists in `users` table)
-    # If it is, then run the model.
-    # return Response(content=wav.getvalue(), media_type="audio/wav")
-    # If it isn't, then return a 401.
+    if len(data) == 1:
+        # user is registered.
+
+        start = time.time()
+        wav = Model().run_tts.call(text, voices)
+        end = time.time()
+
+        # Update the user's usage.
+        supabase.table("users").update({"usage": data[0]["usage"] + (end - start)}).eq(
+            "api_key", api_key
+        ).execute()
+
+        return Response(content=wav.getvalue(), media_type="audio/wav")
+    else:
+        # return a 401
+        return Response(status_code=401)
 
 
 if __name__ == "__main__":
