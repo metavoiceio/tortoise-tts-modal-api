@@ -32,7 +32,7 @@ def app(req: Request):
     api_key = body["api_key"]
     target_file_web_path = body.get("target_file", None)
 
-    data = supabase.table("users").select("*").eq("api_key", api_key).execute()
+    data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
 
     if len(data) == 1:
         # user is registered.
@@ -42,9 +42,16 @@ def app(req: Request):
         end = time.time()
 
         # Update the user's usage.
-        supabase.table("users").update({"usage": data[0]["usage"] + (end - start)}).eq(
-            "api_key", api_key
-        ).execute()
+        fresh_data_usage_dollar = (
+            supabase.table("users")
+            .select("*")
+            .eq("api_key", api_key)
+            .execute()
+            .data[0]["usage_dollar"]
+        )
+        supabase.table("users").update(
+            {"usage_dollar": fresh_data_usage_dollar + 0.0005833 * (end - start)}
+        ).eq("api_key", api_key).execute()
 
         return Response(content=wav.getvalue(), media_type="audio/wav")
     else:
