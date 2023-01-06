@@ -40,6 +40,7 @@ Make sure to include headers that keep the connection alive sufficiently long as
 ## Contributing
 
 ### TODOs
+- Use GPT-3 to perform text normalisation
 - Inference optimisations
     - TODO: add ideas
 - Finetuning code 
