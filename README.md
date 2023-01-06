@@ -6,5 +6,11 @@ Tortoise is one of the best text-to-speech systems ever built, but it currently 
 
 We have made some improvements to Tortoise to make the inference 30% faster, and welcome contributions to improve it further!
 
+## Voices
+There are four ways to get different voices out of this model:
+- `random`: The model randomly picks a voice in its embedding space
+- `<name>`: Use one of the voices the model was trained on (e.g. `train_grace`)
+- `<name>&<name>`: Combine two voices (e.g. `train_grace&emma`)
+- Zero-shot: Provide a few utterances from a speaker you're trying to clone. This can be used with this repository by uploading those utterances to a static file store (like public S3 bucket) and providing the links to the files within the body of the request (`target_path` parameter).
 ## Developer environment
 - `python=3.10.8` (important for Modal)
