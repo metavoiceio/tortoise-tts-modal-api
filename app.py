@@ -47,8 +47,11 @@ def post_request(req: Request):
     target_file_web_path = body.get("target_file", None)
 
     data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
-    if (data[0].usage_dollar >= MAX_DOLLARS):
-        return Response(status_code=403, content='No more credits left. Please upgrade to the pay-as-you-go plan')
+    if data[0]["usage_dollar"] >= MAX_DOLLARS:
+        return Response(
+            status_code=403,
+            content="No more credits left. Please upgrade to the pay-as-you-go plan",
+        )
 
     if len(data) == 1:
         # user is registered.
