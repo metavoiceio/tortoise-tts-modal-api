@@ -1,5 +1,12 @@
 # 🐢 Tortoise TTS pay-as-you-go API
 
+## Links
+Twitter Thread: [link](https://twitter.com/vatsal_aggarwal/status/1612536547248836608?s=20)
+
+Deployed Website: [tts.themetavoice.xyz](https://tts.themetavoice.xyz)
+
+## Introduction
+
 A "pay-as-you-go" API for [Tortoise TTS](https://github.com/neonbjb/tortoise-tts/). It uses [Modal](https://modal.com/) underneath.
 
 Tortoise is one of the best text-to-speech systems ever built, but it currently requires the user to deploy their own service on a GPU which can be time-consuming, difficult & expensive. The alternative is to use paid services which offer a monthly pricing tier and are closed-off. This repository aims to provide a usage-based, pay-as-you-go API based on open-source code instead.
