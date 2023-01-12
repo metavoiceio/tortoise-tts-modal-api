@@ -5,3 +5,6 @@ requests
 pydub
 numpy
 fastapi
+torch
+torchvision
+torchaudio
