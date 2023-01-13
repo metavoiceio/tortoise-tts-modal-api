@@ -147,3 +147,57 @@ class TortoiseModal:
         wav = self.process_synthesis_result(gen.squeeze(0).cpu())
 
         return wav
+
+
+class ParallelTortoise:
+    def __enter__(self):
+        """
+        Load the model weights into GPU memory when the container starts.
+        """
+        from tortoise.api import MODELS_DIR, TextToSpeech
+        from tortoise.utils.audio import load_audio, load_voices
+
+        self.load_voices = load_voices
+        self.load_audio = load_audio
+        self.tts = TextToSpeech(models_dir=MODELS_DIR)
+        self.tts.get_random_conditioning_latents()
+
+    @stub.function(
+        image=tortoise_image,
+        mounts=[
+            modal.Mount(
+                # TODO: figure out how to make this a variable.
+                local_dir="/Users/vatsalaggarwal/Documents/workspace/tortoise-tts-modal-api/voices",
+                remote_dir="/voices",
+            )
+        ],
+        gpu="A10G",
+        timeout=15 * 60,
+    )
+    def run_tts(self, text, voices):
+        """
+        Runs tortoise tts on a given text and voice. Alternatively, a
+        web path can be to a target file to be used instead of a voice for
+        one-shot synthesis.
+        """
+        CANDIDATES = 1  # NOTE: this code only works for one candidate.
+        CVVP_AMOUNT = 0.0
+        SEED = None
+        PRESET = "fast"
+
+        voice_samples, conditioning_latents = self.load_voices(
+            [voices], extra_voice_dirs=["/voices"]
+        )
+
+        gen, _ = self.tts.tts_with_preset(
+            text,
+            k=CANDIDATES,
+            voice_samples=voice_samples,
+            conditioning_latents=conditioning_latents,
+            preset=PRESET,
+            use_deterministic_seed=SEED,
+            return_deterministic_state=True,
+            cvvp_amount=CVVP_AMOUNT,
+        )
+
+        return gen.squeeze(0).cpu()
