@@ -8,8 +8,6 @@ from fastapi.responses import Response
 
 from model import TortoiseModal, stub
 
-MAX_DOLLARS = 5
-
 ## Setup FastAPI server.
 web_app = fastapi.FastAPI()
 web_app.add_middleware(
@@ -47,7 +45,9 @@ def post_request(req: Request):
     target_file_web_paths = body.get("target_file", None)
 
     data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
-    if data[0]["usage_dollar"] >= MAX_DOLLARS:
+    
+    # check: out of credits
+    if data[0]["usage_dollar"] >= data[0]["max_credit_dollar"]:
         return Response(
             status_code=403,
             content="No more credits left. Please upgrade to the pay-as-you-go plan",
