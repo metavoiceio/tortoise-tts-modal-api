@@ -63,7 +63,7 @@ class TortoiseModal:
 
         return wav
 
-    def load_target_file(self, target_file_web_path, name):
+    def load_target_files(self, target_file_web_paths, name):
         """
         Downloads a target file from a static file store web and stores it in a directory structure
         expected by Tortoise.
@@ -73,26 +73,36 @@ class TortoiseModal:
         """
         # curl to download file to temp file
         os.makedirs(f"/voices/{name}", exist_ok=True)
-        target_file = "/voices/" + f"{name}/" + os.path.split(target_file_web_path)[-1]
-        if (
-            subprocess.run(
-                f"curl -o {target_file} {target_file_web_path}",
-                shell=True,
-                stdout=subprocess.PIPE,
-            ).returncode
-            != 0
-        ):
-            raise ValueError("Failed to download file.")
 
-        # check size -- should be <= 100 Mb
-        if os.path.getsize(target_file) > 100000000:
-            raise ValueError("File too large.")
+        if type(target_file_web_paths) == str:
+            target_file_web_paths = [target_file_web_paths]
 
-        return f"/voices/"
+        if type(target_file_web_paths) != list:
+            raise ValueError("`target_file` must be a string or list of strings.")
+
+        for target_file_web_path in target_file_web_paths:
+            target_file = (
+                "/voices/" + f"{name}/" + os.path.split(target_file_web_path)[-1]
+            )
+            if (
+                subprocess.run(
+                    f"curl -o {target_file} {target_file_web_path}",
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                ).returncode
+                != 0
+            ):
+                raise ValueError(f"Failed to download file {target_file_web_path}.")
+
+            # check size -- should be <= 100 Mb
+            if os.path.getsize(target_file) > 100000000:
+                raise ValueError("File too large.")
+
+        return "/voices/"
 
     # TODO: check if you want to use different GPUs?
     @stub.function(image=tortoise_image, gpu="A10G")
-    def run_tts(self, text, voices, target_file_web_path):
+    def run_tts(self, text, voices, target_file_web_paths):
         """
         Runs tortoise tts on a given text and voice. Alternatively, a
         web path can be to a target file to be used instead of a voice for
@@ -103,11 +113,11 @@ class TortoiseModal:
         SEED = None
         PRESET = "fast"
 
-        if target_file_web_path is not None:
+        if target_file_web_paths is not None:
             voice_name = "target"
             if voices != "":
                 raise ValueError("Cannot specify both target_file and voices.")
-            target_dir = self.load_target_file(target_file_web_path, name=voice_name)
+            target_dir = self.load_target_files(target_file_web_paths, name=voice_name)
             voice_samples, conditioning_latents = self.load_voices(
                 [voice_name], extra_voice_dirs=[target_dir]
             )
