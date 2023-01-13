@@ -46,8 +46,9 @@ def post_request(req: Request):
 
     data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
     
+    max_credit_dollar = data[0]["max_credit_dollar"]
     # check: out of credits
-    if data[0]["usage_dollar"] >= data[0]["max_credit_dollar"]:
+    if data[0]["usage_dollar"] >= max_credit_dollar:
         return Response(
             status_code=403,
             content="No more credits left. Please upgrade to the pay-as-you-go plan",
@@ -79,16 +80,25 @@ def post_request(req: Request):
         end = time.time()
 
         # Update the user's usage.
-        fresh_data_usage_dollar = (
+        old_usage_dollar = (
             supabase.table("users")
             .select("*")
             .eq("api_key", api_key)
             .execute()
             .data[0]["usage_dollar"]
         )
+
+        new_usage_dollar = old_usage_dollar + 0.0005833 * (end - start)
         supabase.table("users").update(
-            {"usage_dollar": fresh_data_usage_dollar + 0.0005833 * (end - start)}
+            {"usage_dollar": new_usage_dollar }
         ).eq("api_key", api_key).execute()
+
+        # check: out of credits
+        if new_usage_dollar >= data[0]["max_credit_dollar"]:
+            return Response(
+                status_code=403,
+                content="No more credits left. Please upgrade to the pay-as-you-go plan",
+            )
 
         return Response(content=wav.getvalue(), media_type="audio/wav")
     else:
