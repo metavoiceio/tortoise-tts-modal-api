@@ -53,12 +53,23 @@ def post_request(req: Request):
             content="No more credits left. Please upgrade to the pay-as-you-go plan",
         )
 
-    supabase.table("synthesis").insert(
-        {
-            "user_id": data[0]["id"],
-            "input": text,
-        }
-    ).execute()
+    if target_file_web_paths:
+        supabase.table("synthesis").insert(
+            {
+                "user_id": data[0]["id"],
+                "input": text,
+                "voices": voices,
+                "target_file_web_paths": target_file_web_paths,
+            }
+        ).execute()
+    else:
+        supabase.table("synthesis").insert(
+            {
+                "user_id": data[0]["id"],
+                "input": text,
+                "voices": voices,
+            }
+        ).execute()
 
     if len(data) == 1:
         # user is registered.
