@@ -25,8 +25,7 @@ from model import ParallelTortoise, stub
 )
 def long_synthesis(text, voices):
     """
-    POST endpoint for running Tortoise. Checks whether the user exists,
-    and adds usage time to the user's account.
+    Modal function for running Tortoise for long-form content.
     """
     import asyncio
     import time
