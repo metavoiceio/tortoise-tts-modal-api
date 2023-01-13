@@ -44,7 +44,7 @@ def post_request(req: Request):
     text = body["text"]
     voices = body["voices"]
     api_key = body["api_key"]
-    target_file_web_path = body.get("target_file", None)
+    target_file_web_paths = body.get("target_file", None)
 
     data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
     if data[0]["usage_dollar"] >= MAX_DOLLARS:
@@ -57,7 +57,7 @@ def post_request(req: Request):
         # user is registered.
 
         start = time.time()
-        wav = TortoiseModal().run_tts.call(text, voices, target_file_web_path)
+        wav = TortoiseModal().run_tts.call(text, voices, target_file_web_paths)
         end = time.time()
 
         # Update the user's usage.
