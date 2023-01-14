@@ -37,8 +37,8 @@ Make sure to include headers that keep the connection alive sufficiently long as
         - Choices are: `angie`, `applejack`, `cond_latent_example`, `daniel`, `deniro`, `emma`, `freeman`, `geralt`, `halle`, `jlaw`, `lj`, `mol`, `myself`, `pat`, `pat2`, `rainbow`, `snakes`, `tim_reynolds`, `tom`, `train_atkins`, `train_daws`, `train_dotrice`, `train_dreams`, `train_empire`, `train_grace`, `train_kennard`, `train_lescault`, `train_mouse`, `weaver`, `william`
     - `"<name>&<name>"`: Combine two voices (e.g. `train_grace&emma`)
     - `""`: (Zero-shot) Used with `target_file` parameter described next to synthesize text in the voice of an utterance given by the user.
-- [optional] `target_file`: A pointer to a mp3 or wav file from a speaker whose voice you're trying to synthesize text in. This should be uploaded to a static file store (like a public s3 bucket).
-    - This parameter is unused if `voices` is specified, and shouldn't be specified as part of the body.
+- [optional] `target_file`: A pointer to a mp3 or wav file from a speaker whose voice you're trying to synthesize text in. Alternatively, a list of such links can also be passed in. The files should be uploaded to a static file store (like a public s3 bucket).
+    - This parameter is unused if `voices` is specified. If `voices` is specified, this shouldn't be specified as part of the body.
     - If this parameter is used, make sure that `voices` is set to `""`. 
 
 ### Python Wrapper
