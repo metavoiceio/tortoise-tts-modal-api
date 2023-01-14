@@ -45,7 +45,7 @@ def post_request(req: Request):
     target_file_web_paths = body.get("target_file", None)
 
     data = supabase.table("users").select("*").eq("api_key", api_key).execute().data
-    
+
     max_credit_dollar = data[0]["max_credit_dollar"]
     # check: out of credits
     if data[0]["usage_dollar"] >= max_credit_dollar:
@@ -89,9 +89,9 @@ def post_request(req: Request):
         )
 
         new_usage_dollar = old_usage_dollar + 0.0005833 * (end - start)
-        supabase.table("users").update(
-            {"usage_dollar": new_usage_dollar }
-        ).eq("api_key", api_key).execute()
+        supabase.table("users").update({"usage_dollar": new_usage_dollar}).eq(
+            "api_key", api_key
+        ).execute()
 
         # check: out of credits
         if new_usage_dollar >= data[0]["max_credit_dollar"]:
