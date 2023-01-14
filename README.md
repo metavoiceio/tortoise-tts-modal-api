@@ -19,7 +19,7 @@ We also provide a Python API wrapper that can used for easy integration into you
 You can use the HTTP end-point directly, or the provided Python wrapper.
 
 ### HTTP end-point
-The synthesis can be done by send a POST request to "https://vatsalaggarwal--tts-app.modal.run". 
+The synthesis can be done by send a POST request to "https://metavoicexyz--tts-app.modal.run/". 
 
 #### Headers
 Make sure to include headers that keep the connection alive sufficiently long as the inference can take 30s-150s.
