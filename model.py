@@ -23,6 +23,7 @@ tortoise_image = (
         "torchvision",
         "torchaudio",
         "pydub",
+        "transformers==4.29.2",
         extra_index_url="https://download.pytorch.org/whl/cu116",
     )
     .pip_install("git+https://github.com/metavoicexyz/tortoise-tts")
