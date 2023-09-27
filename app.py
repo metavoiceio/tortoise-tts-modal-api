@@ -20,7 +20,7 @@ web_app.add_middleware(
 
 ###### MODAL CPU API Key Logic.
 
-supabase_image = modal.Image.debian_slim().pip_install("supabase")
+supabase_image = modal.Image.debian_slim().pip_install("supabase", "pydantic==1.10.12")
 
 
 @web_app.post("/")
@@ -106,13 +106,10 @@ def post_request(req: Request):
         return Response(status_code=401)
 
 
-@stub.asgi(
+@stub.function(
     image=supabase_image,
     secret=modal.Secret.from_name("supabase-tortoise-secrets"),
 )
+@modal.asgi_app()
 def app():
     return web_app
-
-
-if __name__ == "__main__":
-    stub.serve()

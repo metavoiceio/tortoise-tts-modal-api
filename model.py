@@ -23,6 +23,7 @@ tortoise_image = (
         "torchvision",
         "torchaudio",
         "pydub",
+        "pydantic==1.10.12",
         "transformers==4.29.2",
         extra_index_url="https://download.pytorch.org/whl/cu116",
     )
@@ -31,6 +32,8 @@ tortoise_image = (
 )
 
 
+# TODO: check if you want to use different GPUs?
+@stub.cls(image=tortoise_image, gpu="A10G")
 class TortoiseModal:
     def __enter__(self):
         """
@@ -101,8 +104,7 @@ class TortoiseModal:
 
         return "/voices/"
 
-    # TODO: check if you want to use different GPUs?
-    @stub.function(image=tortoise_image, gpu="A10G")
+    @modal.method()
     def run_tts(self, text, voices, target_file_web_paths):
         """
         Runs tortoise tts on a given text and voice. Alternatively, a
